@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Voice Companion</title>
+  <style>
+    body {
+      background-color: #0d0d0d;
+      color: #fff;
+      font-family: 'Segoe UI', sans-serif;
+      text-align: center;
+      padding: 40px;
+    }
+    h1 {
+      color: #00ffff;
+    }
+    button {
+      background-color: #00ffff;
+      color: #000;
+      border: none;
+      padding: 12px 24px;
+      font-size: 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      margin-top: 20px;
+    }
+    #outputText {
+      margin-top: 30px;
+      font-size: 18px;
+      color: #ffccff;
+    }
+  </style>
+</head>
+<body>
+  <h1>Talk to Me</h1>
+  <button onclick="startListening()">Start Listening</button>
+  <p id="outputText">Waiting for input...</p>
+
+  <script>
+    const output = document.getElementById("outputText");
+
+    function startListening() {
+      const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+      recognition.lang = "en-US";
+      recognition.start();
+
+      recognition.onresult = function (event) {
+        const transcript = event.results[0][0].transcript;
+        output.innerText = "You said: " + transcript;
+
+        fetch("/ask", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ message: transcript })
+        })
+          .then(res => res.json())
+          .then(data => {
+            output.innerText += "\nResponse: " + data.reply;
+          })
+          .catch(err => {
+            output.innerText = "Error: " + err.message;
+          });
+      };
+    }
+  </script>
+</body>
+</html>

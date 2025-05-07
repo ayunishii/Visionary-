@@ -1,0 +1,11 @@
+entrypoint = "index.js"
+language = "nodejs"
+modules = ["nodejs-20"]
+
+[env]
+NODE_ENV = "development"
+run = "node index.js"
+
+[[ports]]
+localPort = 3000
+externalPort = 80
